@@ -14,3 +14,9 @@ python3 -m venv .venv
 ```sh
 .venv/bin/python -m pytest -v
 ```
+
+## Linting
+
+```sh
+.venv/bin/ruff check src/ tests/
+```
