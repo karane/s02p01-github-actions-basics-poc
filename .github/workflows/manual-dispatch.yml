@@ -1,0 +1,55 @@
+name: Manual Dispatch
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "staging"
+        type: choice
+        options:
+          - staging
+          - production
+      run_tests:
+        description: "Run tests before deploying"
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  validate:
+    name: Validate (${{ github.event.inputs.environment }})
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.run_tests == 'true' }}
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Run tests
+        run: pytest tests/ -v
+
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    needs: [validate]
+    if: always() && (needs.validate.result == 'success' || needs.validate.result == 'skipped')
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Simulate deploy
+        run: |
+          echo "Deploying to ${{ github.event.inputs.environment }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Commit: ${{ github.sha }}"
