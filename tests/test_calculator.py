@@ -1,9 +1,10 @@
-import sys
 import os
+import sys
+
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-from calculator import add, subtract, multiply, divide
+from calculator import add, divide, multiply, subtract
 
 
 def test_add_positive_numbers():
